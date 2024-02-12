@@ -7,7 +7,11 @@ import {
   CognitoUserPool,
 } from 'amazon-cognito-identity-js';
 import { AuthConfig } from './auth.config';
-import { RegisterDTO, ResendConfirmationCodeDTO } from './dto/auth.dto';
+import {
+  RegisterDTO,
+  ResendConfirmationCodeDTO,
+  VerifyAccountDTO,
+} from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -89,6 +93,26 @@ export class AuthService {
         } else {
           resolve({
             message: 'A confirmation code has been sent to your email address.',
+          });
+        }
+      });
+    });
+  }
+
+  verifyAccount({ email, code }: VerifyAccountDTO) {
+    const userData = {
+      Username: email,
+      Pool: this.userPool,
+    };
+
+    const user = new CognitoUser(userData);
+    return new Promise((resolve, reject) => {
+      user.confirmRegistration(code, true, (err, result) => {
+        if (err) {
+          reject(new HttpException(err.message, HttpStatus.BAD_REQUEST));
+        } else {
+          resolve({
+            message: 'Successfully verified your account. Please login.',
           });
         }
       });
