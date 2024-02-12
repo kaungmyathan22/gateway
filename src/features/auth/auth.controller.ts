@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDTO } from './dto/regsiter.dto';
+import { RegisterDTO, ResendConfirmationCodeDTO } from './dto/auth.dto';
 
 @Controller('api/v1/authentication')
 export class AuthController {
@@ -20,14 +20,8 @@ export class AuthController {
     }
   }
 
-  @Post('verify')
-  async verify(
-    @Body() authenticateRequest: { name: string; password: string },
-  ) {
-    try {
-      return await this.authService.authenticateUser(authenticateRequest);
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
+  @Post('resend-verification-code')
+  async verify(@Body() payload: ResendConfirmationCodeDTO) {
+    return await this.authService.resendConfirmationCode(payload);
   }
 }

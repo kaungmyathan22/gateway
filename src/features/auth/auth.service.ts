@@ -7,12 +7,11 @@ import {
   CognitoUserPool,
 } from 'amazon-cognito-identity-js';
 import { AuthConfig } from './auth.config';
-import { RegisterDTO } from './dto/regsiter.dto';
+import { RegisterDTO, ResendConfirmationCodeDTO } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
   private userPool: CognitoUserPool;
-  private sessionUserAttributes: {};
   constructor(
     @Inject('AuthConfig')
     private readonly authConfig: AuthConfig,
@@ -70,6 +69,28 @@ export class AuthService {
         onFailure: err => {
           reject(err);
         },
+      });
+    });
+  }
+
+  resendConfirmationCode({ email }: ResendConfirmationCodeDTO) {
+    const userData = {
+      Username: email,
+      Pool: this.userPool,
+    };
+    const user = new CognitoUser(userData);
+    return new Promise((resolve, reject) => {
+      user.resendConfirmationCode(err => {
+        if (err) {
+          console.error(err);
+          reject(
+            new HttpException('Something went wrong', HttpStatus.BAD_REQUEST),
+          );
+        } else {
+          resolve({
+            message: 'A confirmation code has been sent to your email address.',
+          });
+        }
       });
     });
   }

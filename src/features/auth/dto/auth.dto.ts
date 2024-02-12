@@ -7,3 +7,9 @@ export class RegisterDTO {
   @IsString()
   password: string;
 }
+
+export class ResendConfirmationCodeDTO {
+  @IsString()
+  @IsEmail()
+  email: string;
+}
